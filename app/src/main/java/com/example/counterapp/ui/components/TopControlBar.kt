@@ -45,7 +45,7 @@ fun TopControlBar(onMenuClick: () -> Unit) {
                 onExpandedChange = { expanded = !expanded }
             ) {
                 TextField(
-                    value = "Select Option",
+                    value = "My Location",
                     onValueChange = {},
                     readOnly = true,
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -56,11 +56,11 @@ fun TopControlBar(onMenuClick: () -> Unit) {
                     onDismissRequest = { expanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Option 1") },
+                        text = { Text("Location 1") },
                         onClick = { expanded = false }
                     )
                     DropdownMenuItem(
-                        text = { Text("Option 2") },
+                        text = { Text("Location 2") },
                         onClick = { expanded = false }
                     )
                 }
@@ -85,7 +85,7 @@ fun DrawerContent(
     drawerState: DrawerState
 ) {
     val items = listOf(
-        "Dashboard", "Neighbours", "Devices", "History", "Settings",
+        "Back", "Dashboard", "Neighbours", "Devices", "History", "Settings",
         "Ring Plan", "Setup a device", "Account settings", "Control centre", "What's new"
     )
 
@@ -108,7 +108,7 @@ fun DrawerContent(
                 border = BorderStroke(1.dp, Color.LightGray), // Add border
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
+                    .padding(vertical = 3.dp, horizontal = 8.dp)
             ) {
                 Text(
                     text = item,

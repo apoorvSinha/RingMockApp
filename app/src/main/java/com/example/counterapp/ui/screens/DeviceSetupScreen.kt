@@ -38,10 +38,14 @@ data class Device(val name: String, val description: String)
 
 fun getDeviceList(): List<Device> {
     return listOf(
-        Device("Smart Camera", "Indoor/Outdoor security camera"),
+        Device("Doorbells", "Indoor/Outdoor Doorbell"),
+        Device("Security Camera", "Indoor/Outdoor security camera"),
+        Device("Chime", "Indoor Chime"),
+        Device("Security", "Alarm device"),
+        Device("Pet Tag", "Safety for your pets"),
         Device("Door Sensor", "Detect door openings"),
         Device("Motion Sensor", "Detect movement in a room"),
         Device("Smart Lock", "Control access to your home"),
-        // Add more devices as needed
+        Device("Smart Light", "Control access to your Lights"),
     )
 }
