@@ -1,4 +1,4 @@
-package com.example.yourapp.ui.components
+package com.example.counterapp.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background

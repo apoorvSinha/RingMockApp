@@ -10,9 +10,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,16 +24,18 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.counterapp.ui.screens.DeviceSetupProgressScreen
 import com.example.counterapp.ui.screens.DeviceSetupValuesScreen
-import com.example.yourapp.ui.components.CircularButton
-import com.example.yourapp.ui.components.DrawerContent
-import com.example.yourapp.ui.components.Tile
-import com.example.yourapp.ui.components.TopControlBar
+import com.example.counterapp.ui.components.DrawerContent
+import com.example.counterapp.ui.components.ImageTile
+import com.example.counterapp.ui.components.Tile
+import com.example.counterapp.ui.components.TopControlBar
+import com.example.counterapp.ui.screens.DeviceSetupSuccessScreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SecurityControlPage() {
     val navController = rememberNavController()
+    var isSetupJustCompleted: Boolean = false
 
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
@@ -79,6 +81,14 @@ fun SecurityControlPage() {
             DeviceSetupProgressScreen(
                 heading = "Ring device is trying to setup, Waiting for an existing Ring device to auto setup",
                 onCompletion = {
+                    navController.navigate("deviceSetupSuccess")
+                }
+            )
+        }
+
+        composable("deviceSetupSuccess") {
+            DeviceSetupSuccessScreen(
+                onFinish = {
                     navController.navigate("home") {
                         popUpTo("home") { inclusive = true }
                     }
@@ -107,6 +117,7 @@ fun SecurityControlPage() {
 fun SecurityControlContent(onSetupDeviceClick: () -> Unit) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val RingBlue = Color(0xFF03A9F4) // Replace with the exact Ring color if it's different
 
     val drawerWidth = animateDpAsState(
         if (drawerState.isOpen) (LocalConfiguration.current.screenWidthDp * 0.7f).dp else 0.dp,
@@ -148,7 +159,7 @@ fun SecurityControlContent(onSetupDeviceClick: () -> Unit) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
-                            .height(56.dp)
+                            .height(66.dp)
                             .border(2.dp, Color.Red, RoundedCornerShape(8.dp)),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                         shape = RoundedCornerShape(8.dp)
@@ -164,35 +175,89 @@ fun SecurityControlContent(onSetupDeviceClick: () -> Unit) {
                             )
                             Column(
                                 horizontalAlignment = Alignment.Start,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(2.dp) // Adjust spacing as needed
                             ) {
                                 Text(
                                     "Attention: SOS not setup",
                                     color = Color.Black,
                                     modifier = Modifier.weight(1f),
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 18.sp
+
                                 )
                                 Text(
                                     "Action Required",
                                     color = Color.Black,
                                     textAlign = TextAlign.Center,
                                     style = MaterialTheme.typography.bodySmall,
-                                    fontSize = 12.sp
+                                    fontSize = 14.sp
                                 )
                             }
                         }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
-                    // Scrollable tiles
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
                             .padding(horizontal = 16.dp)
                     ) {
+                        // neighbour icons
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            ImageTile(
+                                imageName = "neighbours",
+                                imageDescription = "neighbour",
+                                ratioHeight = 32f,
+                                ratioWidth = 10f
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+
+                        // Camera tiles
                         items(5) { index ->
                             Tile(index)
                             Spacer(modifier = Modifier.height(16.dp))
+                        }
+
+                        //Promotion tiles
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            ImageTile(
+                                imageName = "promotions",
+                                imageDescription = "Promotions",
+                                ratioHeight = 1f,
+                                ratioWidth = 1f
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                        item{
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+
+                        // Setup device button
+                        item {
+                            Button(
+                                onClick = onSetupDeviceClick,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .height(48.dp), // Standard height for buttons
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.White) // White background
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center // Center the text horizontally
+                                ) {
+                                    Text(
+                                        text = "Set Up a Device",
+                                        color = RingBlue, // Use the Ring brand color
+                                        fontSize = 18.sp,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+
                         }
                     }
                 }

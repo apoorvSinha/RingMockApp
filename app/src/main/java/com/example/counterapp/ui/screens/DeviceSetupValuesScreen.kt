@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -21,6 +22,7 @@ fun DeviceSetupValuesScreen(
     var inputValue1 by remember { mutableStateOf("My Location") }
     var inputValue2 by remember { mutableStateOf("Cocoa Camera") }
     var checkboxStates by remember { mutableStateOf(List(5) { false }) }
+    val RingBlue = Color(0xFF03A9F4) // Replace with the exact Ring color if it's different
 
     Column(modifier = Modifier.padding(vertical = 48.dp)) {
         // Fixed heading
@@ -86,7 +88,11 @@ fun DeviceSetupValuesScreen(
                                     selected = isChecked,
                                     onClick = {
                                         checkboxStates = checkboxStates.toMutableList().also { it[index] = true }
-                                    }
+                                    },
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = RingBlue,
+                                        unselectedColor = Color.Black
+                                    )
                                 )
                                 Text("Yes", Modifier.padding(start = 4.dp), fontSize = 16.sp)
                             }
@@ -96,7 +102,11 @@ fun DeviceSetupValuesScreen(
                                     selected = !isChecked,
                                     onClick = {
                                         checkboxStates = checkboxStates.toMutableList().also { it[index] = false }
-                                    }
+                                    },
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = RingBlue,
+                                        unselectedColor = Color.Black
+                                    )
                                 )
                                 Text("No", Modifier.padding(start = 4.dp), fontSize = 16.sp)
                             }
@@ -112,7 +122,12 @@ fun DeviceSetupValuesScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                .height(56.dp)
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = RingBlue,  // Background color
+                contentColor = Color.White    // Text/Icon color
+            )
+
         ) {
             Text("Continue Setting Up Manually", fontSize = 18.sp)
         }
@@ -123,7 +138,11 @@ fun DeviceSetupValuesScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                .height(56.dp)
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = RingBlue,  // Background color
+                contentColor = Color.White    // Text/Icon color
+            )
         ) {
             Text("Confirm", fontSize = 18.sp)
         }

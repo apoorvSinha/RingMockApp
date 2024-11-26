@@ -1,4 +1,4 @@
-package com.example.yourapp.ui.components
+package com.example.counterapp.ui.components
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape

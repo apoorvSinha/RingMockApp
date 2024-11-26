@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -24,6 +25,7 @@ fun DeviceSetupProgressScreen(
     onCompletion: () -> Unit
 ) {
     val progress = remember { mutableStateOf(0f) }
+    val RingBlue = Color(0xFF03A9F4) // Replace with the exact Ring color if it's different
 
     LaunchedEffect(Unit) {
         for (i in 0..100) {
@@ -58,6 +60,7 @@ fun DeviceSetupProgressScreen(
         // Progress Bar
         LinearProgressIndicator(
             progress = progress.value,
+            color = RingBlue,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(8.dp)
