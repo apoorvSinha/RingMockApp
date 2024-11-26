@@ -1,3 +1,4 @@
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,10 +11,11 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeviceSetupScreen(onBackPress: () -> Unit) {
+fun DeviceSetupScreen(onBackPress: () -> Unit, onDeviceSelected: (String) -> Unit) {
     Column {
         TopAppBar(
             title = { Text("Setup a Device") },
@@ -28,11 +30,13 @@ fun DeviceSetupScreen(onBackPress: () -> Unit) {
                 ListItem(
                     headlineContent = { Text(device.name) },
                     supportingContent = { Text(device.description) },
+                    modifier = Modifier.clickable { onDeviceSelected(device.name) }
                 )
             }
         }
     }
 }
+
 
 data class Device(val name: String, val description: String)
 

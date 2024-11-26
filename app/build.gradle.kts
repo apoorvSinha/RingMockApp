@@ -48,6 +48,8 @@ dependencies {
     implementation ("androidx.navigation:navigation-compose:2.5.3")
     implementation ("androidx.compose.material3:material3:1.0.1")
     implementation ("io.coil-kt:coil-compose:1.4.0")
+    implementation ("androidx.compose.runtime:runtime:1.5.0")
+    implementation ("androidx.compose.ui:ui:1.5.0")
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)

@@ -1,20 +1,29 @@
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.FontScaling
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.counterapp.ui.screens.DeviceSetupProgressScreen
+import com.example.counterapp.ui.screens.DeviceSetupValuesScreen
 import com.example.yourapp.ui.components.CircularButton
 import com.example.yourapp.ui.components.DrawerContent
 import com.example.yourapp.ui.components.Tile
@@ -34,15 +43,64 @@ fun SecurityControlPage() {
                 }
             )
         }
+
         composable("deviceSetup") {
             DeviceSetupScreen(
                 onBackPress = {
                     navController.popBackStack()
+                },
+                onDeviceSelected = { deviceName ->
+                    navController.navigate("deviceSetupValues/$deviceName")
+                }
+            )
+        }
+
+        composable(
+            "deviceSetupValues/{deviceName}",
+            arguments = listOf(navArgument("deviceName") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val deviceName = remember { backStackEntry.arguments?.getString("deviceName") ?: "" }
+            DeviceSetupValuesScreen(
+                onBackPress = {
+                    navController.popBackStack()
+                },
+                onConfirm = {
+                    navController.navigate("deviceSetupProgress")
+                },
+                onContinueManually = {
+                    navController.navigate("deviceSetupScanner/$deviceName")
+                }
+
+            )
+        }
+
+        // New Route for Progress Screen
+        composable("deviceSetupProgress") {
+            DeviceSetupProgressScreen(
+                heading = "Ring device is trying to setup, Waiting for an existing Ring device to auto setup",
+                onCompletion = {
+                    navController.navigate("home") {
+                        popUpTo("home") { inclusive = true }
+                    }
                 }
             )
         }
     }
+    /*
+    composable(
+        "deviceSetupScanner/{deviceName}",
+        arguments = listOf(navArgument("deviceName") { type = NavType.StringType })
+    ) { backStackEntry ->
+        val deviceName = remember { backStackEntry.arguments?.getString("deviceName") ?: "" }
+        DeviceSetupScannerScreen(
+            onBackPress = {
+                navController.popBackStack()
+            },
+            deviceName = deviceName
+        )
+    }*/
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,24 +142,46 @@ fun SecurityControlContent(onSetupDeviceClick: () -> Unit) {
                         }
                     )
 
-                    // Circular buttons
-                    Row(
+                    // Rectangular button with red outline
+                    Button(
+                        onClick = { /* Handle button click */ },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                            .padding(16.dp)
+                            .height(56.dp)
+                            .border(2.dp, Color.Red, RoundedCornerShape(8.dp)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(8.dp)
                     ) {
-                        CircularButton(text = "Disarm", onClick = { /* Handle Disarm */ })
-                        CircularButton(text = "Home", onClick = { /* Handle Home */ })
-                        CircularButton(text = "Away", onClick = { /* Handle Away */ })
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Warning,
+                                contentDescription = "Attention",
+                                tint = Color.Red
+                            )
+                            Column(
+                                horizontalAlignment = Alignment.Start,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    "Attention: SOS not setup",
+                                    color = Color.Black,
+                                    modifier = Modifier.weight(1f),
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    "Action Required",
+                                    color = Color.Black,
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Cameras",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp, // Set font size to 20sp
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
                     Spacer(modifier = Modifier.height(16.dp))
                     // Scrollable tiles
                     LazyColumn(
@@ -119,9 +199,11 @@ fun SecurityControlContent(onSetupDeviceClick: () -> Unit) {
             }
 
             // Bottom 10% empty space
-            Spacer(modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.1f))
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.1f)
+            )
         }
 
         // Custom drawer
