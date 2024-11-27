@@ -1,5 +1,6 @@
 package com.example.counterapp.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,16 +17,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Tile(index: Int) {
+fun Tile(index: Int, isUpdating: Boolean) {
     val context = LocalContext.current
-    var isUpdating: Boolean = false
     val imageResource = when (index) {
-        0 -> "camera_feed_1"
+        0 -> if (isUpdating) "camera_feed_1_updating" else "camera_feed_1"
         1 -> "camera_feed_2"
         2 -> "camera_feed_3"
         3 -> "camera_feed_4"
         else -> "camera_feed_5"
     }
+
+    Log.d("Image resources", "Image resource: $imageResource")
 
     val resourceId = context.resources.getIdentifier(imageResource, "drawable", context.packageName)
 
@@ -43,25 +45,6 @@ fun Tile(index: Int) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
-            if (isUpdating) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.6f))
-                ) {
-                    Text(
-                        text = "Device Updating...",
-                        color = Color.White,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .background(
-                                Color.Black.copy(alpha = 0.6f),
-                                shape = RoundedCornerShape(4.dp)
-                            )
-                            .padding(8.dp)
-                    )
-                }
-            }
             Text(
                 text = "Camera $index",
                 modifier = Modifier

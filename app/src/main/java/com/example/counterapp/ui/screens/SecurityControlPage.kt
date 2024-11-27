@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -8,43 +9,68 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.counterapp.ui.screens.DeviceSetupProgressScreen
-import com.example.counterapp.ui.screens.DeviceSetupValuesScreen
 import com.example.counterapp.ui.components.DrawerContent
 import com.example.counterapp.ui.components.ImageTile
 import com.example.counterapp.ui.components.Tile
 import com.example.counterapp.ui.components.TopControlBar
+import com.example.counterapp.ui.screens.DeviceSetupProgressScreen
 import com.example.counterapp.ui.screens.DeviceSetupSuccessScreen
+import com.example.counterapp.ui.screens.DeviceSetupValuesScreen
 import kotlinx.coroutines.launch
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.delay
+
+
+class SecurityControlViewModel : ViewModel() {
+    private val _isSetupJustCompleted = MutableStateFlow(false)
+    val isSetupJustCompleted: StateFlow<Boolean> = _isSetupJustCompleted
+
+    fun setSetupCompleted() {
+        Log.d("SecurityControlViewModel", "Setting setup completed to true")
+        viewModelScope.launch {
+            _isSetupJustCompleted.value = true
+            delay(10000) // Show updating state for 10 seconds
+            _isSetupJustCompleted.value = false
+            Log.d("SecurityControlViewModel", "Reset setup completed to false")
+        }
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SecurityControlPage() {
     val navController = rememberNavController()
-    var isSetupJustCompleted: Boolean = false
+    val viewModel: SecurityControlViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
             SecurityControlContent(
                 onSetupDeviceClick = {
                     navController.navigate("deviceSetup")
-                }
+                },
+                viewModel = viewModel
             )
         }
+
 
         composable("deviceSetup") {
             DeviceSetupScreen(
@@ -89,6 +115,7 @@ fun SecurityControlPage() {
         composable("deviceSetupSuccess") {
             DeviceSetupSuccessScreen(
                 onFinish = {
+                    viewModel.setSetupCompleted()
                     navController.navigate("home") {
                         popUpTo("home") { inclusive = true }
                     }
@@ -114,10 +141,16 @@ fun SecurityControlPage() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SecurityControlContent(onSetupDeviceClick: () -> Unit) {
+fun SecurityControlContent(
+    onSetupDeviceClick: () -> Unit,
+    viewModel: SecurityControlViewModel
+) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val RingBlue = Color(0xFF03A9F4) // Replace with the exact Ring color if it's different
+    var isSetupJustCompletedState = viewModel.isSetupJustCompleted.collectAsState()
+    Log.d("foo-bar", "${isSetupJustCompletedState.value}")
+    var isSetupJustCompleted = isSetupJustCompletedState.value
 
     val drawerWidth = animateDpAsState(
         if (drawerState.isOpen) (LocalConfiguration.current.screenWidthDp * 0.7f).dp else 0.dp,
@@ -197,6 +230,16 @@ fun SecurityControlContent(onSetupDeviceClick: () -> Unit) {
                         }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
+
+                    // Use LaunchedEffect to reset the flag after it's been used
+//                    LaunchedEffect(isSetupJustCompleted) {
+//                        if (isSetupJustCompleted) {
+//                            // Wait for a short delay to ensure the UI updates before resetting
+//                            kotlinx.coroutines.delay(2000) // 2 seconds delay
+//                            viewModel.resetSetupCompleted()
+//                        }
+//                    }
+
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -216,8 +259,13 @@ fun SecurityControlContent(onSetupDeviceClick: () -> Unit) {
                         }
 
                         // Camera tiles
-                        items(5) { index ->
-                            Tile(index)
+                        items(5) {
+                            index ->
+                            Tile(
+                                index = index,
+                                isUpdating = isSetupJustCompleted // Assume the first tile is the new device
+                            )
+                            Log.d("value", "$isSetupJustCompleted")
                             Spacer(modifier = Modifier.height(16.dp))
                         }
 
@@ -232,7 +280,7 @@ fun SecurityControlContent(onSetupDeviceClick: () -> Unit) {
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                         }
-                        item{
+                        item {
                             Spacer(modifier = Modifier.height(16.dp))
                         }
 
